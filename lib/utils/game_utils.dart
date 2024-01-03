@@ -1,55 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_cardgame/models/cards_game_model.dart';
 
 class Game {
   final Color hiddenCard = Colors.red;
+  List<CardsModel> cards_list = [
+    CardsModel(name: "Circles", imageUrl: 'imageUrl', color: Colors.green),
+    CardsModel(name: "Bulat", imageUrl: 'imageUrl', color: Colors.green),
+    CardsModel(name: "Squares", imageUrl: 'imageUrl', color: Colors.yellow),
+    CardsModel(name: "Heart", imageUrl: 'imageUrl', color: Colors.cyan),
+    CardsModel(name: "Diamonds", imageUrl: 'imageUrl', color: Colors.amber),
+    CardsModel(name: "Star", imageUrl: 'imageUrl', color: Colors.pink),
+    CardsModel(name: "Segi Tiga", imageUrl: 'imageUrl', color: Colors.blue),
+    CardsModel(name: "Bintang", imageUrl: 'imageUrl', color: Colors.pink),
+    CardsModel(name: "Hati", imageUrl: 'imageUrl', color: Colors.cyan),
+    CardsModel(name: "Belian", imageUrl: 'imageUrl', color: Colors.amber),
+    CardsModel(name: "Segi Empat", imageUrl: 'imageUrl', color: Colors.yellow),
+    CardsModel(name: "Triangles", imageUrl: 'imageUrl', color: Colors.blue),
+  ];
+
   List<Color>? gameColors;
   List<String>? gameImg;
-  List<Color> cards = [
-    Colors.green,
-    Colors.yellow,
-    Colors.yellow,
-    Colors.green,
-    Colors.blue,
-    Colors.blue
-  ];
+
   final String hiddenCardpath = " ";
-  List<String> cards_list = [
-    "Circles",
-    "Triangles",
-    "Bulat",
-    "Squares",
-    "Heart",
-    "Diamonds",
-    "Star",
-    "Segi Tiga",
-    "Bintang",
-    "Hati",
-    "Belian",
-    "Segi Empat",
-  ];
+
   final int cardCount = 12;
-  List<String> answer = [
-    "Circles=Bulat",
-    "Triangles=Segi Tiga",
-    "Bulat=Circles",
-    "Squares=Segi Empat",
-    "Heart=Hati",
-    "Diamonds=Belian",
-    "Star=Bintang",
-    "Segi Tiga=Triangles",
-    "Bintang=Star",
-    "Hati=Heart",
-    "Belian=Diamonds",
-    "Segi Empat=Squares",
-  ];
+
   List<Map<int, String>> matchCheck = [];
   List<String> complete = [];
 
   //methods
   void initGame() {
-    gameColors = List.generate(cardCount, (index) => hiddenCard);
-    gameImg = List.generate(cardCount, (index) => hiddenCardpath);
+    cards_list.shuffle();
   }
 }
-
-

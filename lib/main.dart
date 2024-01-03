@@ -1,9 +1,8 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:flutter_cardgame/utils/game_utils.dart';
 import 'package:flutter_cardgame/widgets/quiz_app_bar.dart';
 import 'package:flutter_cardgame/widgets/quiz_body.dart';
-import 'package:flutter_cardgame/widgets/quiz_bottom_bar.dart';
 import 'package:lottie/lottie.dart';
 
 void main() {
@@ -60,10 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 "assets/correct_animation.json",
                 fit: BoxFit.contain,
                 repeat: false,
-              )
-          );
-        }
-    );
+              ));
+        });
   }
 
   @override
@@ -76,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           matchingQuiz: MatchingMemory(),
         ),
       ),
-      bottomNavigationBar: QuizBottomBar(),
+      // bottomNavigationBar: QuizBottomBar(),
     );
   }
 }
@@ -94,14 +91,13 @@ class _MatchingMemoryState extends State<MatchingMemory> {
   bool hideTest = false;
   final Game _game = Game();
 
-  bool isMatch = false;
+  late List isMatch = List.generate(_game.cards_list.length, (index) => false);
   bool isAlreadyAnswered = false;
 
   int cardCount = 0;
-  String answerCheck = "";
-  String answerCheck1 = "";
-  String answerCheck2 = "";
-
+  Map<String, dynamic>? answerCheck1;
+  Map<String, dynamic>? answerCheck2;
+  bool isDark = false;
   //game stats
   int score = 0;
 
@@ -117,16 +113,20 @@ class _MatchingMemoryState extends State<MatchingMemory> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        const SizedBox(height: 40,),
+        const SizedBox(
+          height: 24,
+        ),
         const Text(
           "Memory Card Game",
           style: TextStyle(
-            fontSize: 48.0,
+            fontSize: 24.0,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),
-        const SizedBox(height: 20,),
+        const SizedBox(
+          height: 20,
+        ),
         //Row(
         //  mainAxisAlignment: MainAxisAlignment.spaceAround,
         //  crossAxisAlignment: CrossAxisAlignment.center,
@@ -136,139 +136,126 @@ class _MatchingMemoryState extends State<MatchingMemory> {
         //  ],
         //),
         Expanded(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.shortestSide,
-            width: MediaQuery.of(context).size.width,
-            child: GridView.builder(
-              itemCount: _game.gameImg!.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 12.0,
-                mainAxisSpacing: 12.0,
-              ),
-              padding: const EdgeInsets.all(12.0),
-              itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    //incrementing the clicks
-                    //tries++;
-                    _game.gameImg![index] = _game.cards_list[index];
-                    _game.matchCheck.add({index: _game.cards_list[index]});
-                  });
-                  if (_game.matchCheck.length == 2) {
-                    answerCheck1 = _game.matchCheck[0].values.first;
-                    answerCheck2 = _game.matchCheck[1].values.first;
-                    isAlreadyAnswered = _game.complete.contains(answerCheck1) && _game.complete.contains(answerCheck2);
-                    if (_game.complete.contains(answerCheck1) && _game.complete.contains(answerCheck2) == true) {
-                      Future.delayed(const Duration(milliseconds: 500), () {
-                        setState(() {
-                          answerCheck1 = "";
-                          answerCheck2 = "";
-                          _game.matchCheck.clear();
-                        });
-                      });
-                    } else if (_game.complete.contains(answerCheck2) == true) {
-                      Future.delayed(const Duration(milliseconds: 500), () {
-                        setState(() {
-                          _game.gameImg![_game.matchCheck[0].keys.first] =
-                          _game.hiddenCardpath;
-                          answerCheck1 = "";
-                          answerCheck2 = "";
-                          _game.matchCheck.clear();
-                        });
-                      });
-                    } else if (_game.complete.contains(answerCheck1) == true) {
-                      Future.delayed(const Duration(milliseconds: 500), () {
-                        setState(() {
-                          _game.gameImg![_game.matchCheck[1].keys.first] =
-                          _game.hiddenCardpath;
-                          answerCheck1 = "";
-                          answerCheck2 = "";
-                          _game.matchCheck.clear();
-                        });
-                      });
-                    } else {
-                      answerCheck = answerCheck1+"="+answerCheck2;
-                      isMatch = _game.answer.contains(answerCheck);
-                      if (isMatch == true) {
-                        //incrementing the score
-                        score += 1;
-                        _game.complete.add(answerCheck1);
-                        _game.complete.add(answerCheck2);
-                        answerCheck1 = "";
-                        answerCheck2 = "";
-                        answerCheck = "";
-                        _game.matchCheck.clear();
-                      }
-                      else {
-                        Future.delayed(const Duration(milliseconds: 500), () {
+            child: SizedBox(
+                height: MediaQuery.of(context).size.shortestSide,
+                width: MediaQuery.of(context).size.width,
+                child: GridView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: _game.cards_list.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 8.0,
+                      mainAxisSpacing: 8.0,
+                    ),
+                    padding: const EdgeInsets.all(12.0),
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
                           setState(() {
-                            _game.gameImg![_game.matchCheck[0].keys.first] = _game.hiddenCardpath;
-                            _game.gameImg![_game.matchCheck[1].keys.first] = _game.hiddenCardpath;
-                            answerCheck1 = "";
-                            answerCheck2 = "";
-                            answerCheck = "";
-                            _game.matchCheck.clear();
+                            isMatch[index] = true;
+                            if (answerCheck1 == null) {
+                              setState(() {
+                                answerCheck1 = {
+                                  "color": _game.cards_list[index].color,
+                                  "index": index
+                                };
+                              });
+                            } else if (answerCheck2 == null) {
+                              setState(() {
+                                answerCheck2 = {
+                                  "color": _game.cards_list[index].color,
+                                  "index": index
+                                };
+                              });
+                            }
+
+                            if (answerCheck2 != null && answerCheck2 != null) {
+                              if (answerCheck1!['color'] !=
+                                  answerCheck2!['color']) {
+                                ///when wrong answer reset isMatch
+                                Future.delayed(Duration(milliseconds: 500), () {
+                                  setState(() {
+                                    isMatch[answerCheck1!['index']] = false;
+                                    isMatch[answerCheck2!['index']] = false;
+                                    answerCheck1 = null;
+                                    answerCheck2 = null;
+                                  });
+                                });
+
+                                print("reseting answered cards");
+                              } else {
+                                ///when true answer reset current choice
+                                setState(() {
+                                  answerCheck1 = null;
+                                  answerCheck2 = null;
+                                });
+                                print("proceed next choice");
+                              }
+                            }
                           });
-                        });
-                      }
-                    }
-                    if (score == 6) {
-                      showDialog(
-                        context: context,
-                        builder: (_) => Dialog(
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                          child: Container(
-                            alignment: FractionalOffset.center,
-                            height: 300.0,
-                            padding: const EdgeInsets.all(20.0),
-                            child:  Lottie.asset(
-                              "correct_animation.json",
-                              fit: BoxFit.contain,
-                              repeat: false,
+                          // print(answerCheck2);
+                          // print(answerCheck1);
+                          if (!isMatch.contains(false)) {
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (_) => Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0,
+                                      child: Container(
+                                        alignment: FractionalOffset.center,
+                                        height: 300.0,
+                                        padding: const EdgeInsets.all(20.0),
+                                        child: Lottie.asset(
+                                          "assets/correct_animation.json",
+                                          fit: BoxFit.contain,
+                                          repeat: false,
+                                        ),
+                                      ),
+                                    ));
+                            Future.delayed(const Duration(seconds: 2), () {
+                              Navigator.pop(context);
+                            });
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: ShapeDecoration(
+                            color: !isMatch[index]
+                                ? isDark
+                                    ? Colors.grey
+                                    : Colors.orange
+                                : _game.cards_list[index].color,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            shadows: const [
+                              BoxShadow(
+                                color: Color(0x33FFC107),
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                                spreadRadius: 2,
+                              )
+                            ],
+                          ),
+                          child: Center(
+                            child: AutoSizeText(
+                              !isMatch[index]
+                                  ? ""
+                                  : _game.cards_list[index].name!,
+                              minFontSize: 16,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        )
+                        ),
                       );
-                    }
-                  }
-                },
-                  child: Container(
-                  margin: const EdgeInsets.all(4.0),
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFFFF8E1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    shadows: const [
-                      BoxShadow(
-                        color: Color(0x33FFC107),
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
-                        spreadRadius: 2,
-                      )
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      _game.gameImg![index],
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-             }
-            )
-          )
-        ),
+                    }))),
       ],
     );
   }
 }
-
