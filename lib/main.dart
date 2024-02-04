@@ -1,3 +1,95 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_cardgame/utils/game_utils.dart';
+import 'package:flutter_cardgame/widgets/quiz_app_bar.dart';
+import 'package:flutter_cardgame/widgets/quiz_body.dart';
+import 'package:lottie/lottie.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'Flutter Demo',
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  //setting text style
+  bool hideTest = false;
+  final Game _game = Game();
+
+  bool isMatch = false;
+  bool isAlreadyAnswered = false;
+
+  //game stats
+  int tries = 0;
+  int score = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _game.initGame();
+  }
+
+  void displayDialog(BuildContext context) {
+    showDialog<String>(
+        barrierColor: Colors.transparent,
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              icon: LottieBuilder.asset(
+                "assets/correct_animation.json",
+                fit: BoxFit.contain,
+                repeat: false,
+              ));
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      drawer: Drawer(),
+      appBar: QuizAppBar(),
+      body: Center(
+        child: QuizBody(
+          matchingQuiz: MatchingMemory(),
+        ),
+      ),
+      // bottomNavigationBar: QuizBottomBar(),
+    );
+  }
+}
+
+class MatchingMemory extends StatefulWidget {
+
+  const MatchingMemory({Key? key, }) : super(key: key);
+
+  @override
+  State<MatchingMemory> createState() => _MatchingMemoryState();
+}
+
+class _MatchingMemoryState extends State<MatchingMemory> with SingleTickerProviderStateMixin{
+  // settings for the text style
+
   TextStyle whiteText = const TextStyle(color: Colors.white);
   bool hideTest = false;
   final Game _game = Game();
